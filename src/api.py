@@ -26,6 +26,10 @@ commands = {
     "vehicleLocations": "http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations"
 }
 
+queries = {
+    "selectAll": "SELECT * FROM statistics"
+}
+
 def convertToJson(xml):
     o = xmltodict.parse(xml)
     return o
@@ -37,10 +41,10 @@ class Connection():
             self.connection = MySQLdb.connect(host=db_hostname, user=db_username, passwd=db_password, db=db_name)
         except Exception as error:
             raise ValueError("Error! Unable to connect to the Database!")
-    def selectQuery(self):
+    def selectQuery(self, query):
         cursor = self.connection.cursor()
         try:
-            cursor.execute("SELECT * FROM statistics")
+            cursor.execute(query)
             result = cursor.fetchall()
             return result
         except:
@@ -51,11 +55,14 @@ class Connection():
         except:
             raise ValueError("Error! Unable to close the DB connection")
 
+# class DbWrapper():
+#     def __init__(self):            
+
 class DbTest(Resource):
     def get(self):
         try:
             connection = Connection()
-            query = connection.selectQuery()
+            query = connection.selectQuery(queries['selectAll'])
             connection.dbDisconnect()
         except ValueError as err:
             return err.args
@@ -66,8 +73,6 @@ class Test(Resource):
     def get(self):
         import requests
         response = requests.get(commands['agencyList'])
-
-        # tree = ET.fromstring(response.content)
         return convertToJson(response.content)
 
 
