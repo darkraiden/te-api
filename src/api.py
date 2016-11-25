@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_restful import reqparse, abort, Api, Resource
-import pycurl
 from StringIO import StringIO
 import MySQLdb
 
