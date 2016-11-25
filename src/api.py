@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import reqparse, abort, Api, Resource
-from StringIO import StringIO
+import requests
 import MySQLdb
 import xml.etree.ElementTree as ET
 import xmltodict, json
@@ -55,15 +55,24 @@ class Connection():
         except:
             raise ValueError("Error! Unable to close the DB connection")
 
-# class DbWrapper():
-#     def __init__(self):            
+class DbWrapper():
+    def __init__(self):
+        self.conn = Connection()
+    def selectQuery(self, query):
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return result
+        except:
+            raise ValueError("Error! Unable to fetch data!")
 
 class DbTest(Resource):
     def get(self):
         try:
-            connection = Connection()
+            connection = DbWrapper()
             query = connection.selectQuery(queries['selectAll'])
-            connection.dbDisconnect()
+            # connection.dbDisconnect()
         except ValueError as err:
             return err.args
 
@@ -71,7 +80,6 @@ class DbTest(Resource):
 
 class Test(Resource):
     def get(self):
-        import requests
         response = requests.get(commands['agencyList'])
         return convertToJson(response.content)
 
