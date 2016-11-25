@@ -4,6 +4,7 @@ RUN pip install flask \
                 flask-restful \
                 requests \
                 MySQL-python \
+                xmltodict \
                 pymysql
 
 EXPOSE 5000

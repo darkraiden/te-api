@@ -2,6 +2,8 @@ from flask import Flask
 from flask_restful import reqparse, abort, Api, Resource
 from StringIO import StringIO
 import MySQLdb
+import xml.etree.ElementTree as ET
+import xmltodict, json
 
 app = Flask(__name__)
 api = Api(app)
@@ -24,6 +26,10 @@ commands = {
     "vehicleLocations": "http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations"
 }
 
+def convertToJson(xml):
+    o = xmltodict.parse(xml)
+    return o
+
 # Class for DB interactions
 class Connection():
     def __init__(self):
@@ -31,7 +37,7 @@ class Connection():
             self.connection = MySQLdb.connect(host=db_hostname, user=db_username, passwd=db_password, db=db_name)
         except Exception as error:
             raise ValueError("Error! Unable to connect to the Database!")
-    def doQuery(self):
+    def selectQuery(self):
         cursor = self.connection.cursor()
         try:
             cursor.execute("SELECT * FROM statistics")
@@ -56,6 +62,14 @@ class DbTest(Resource):
 
         return query
 
+class Test(Resource):
+    def get(self):
+        import requests
+        response = requests.get(commands['agencyList'])
+
+        # tree = ET.fromstring(response.content)
+        return convertToJson(response.content)
+
 
 class DumpServices(Resource):
     def get(self):
@@ -63,6 +77,7 @@ class DumpServices(Resource):
 
 api.add_resource(DumpServices, '/dumpServices')
 api.add_resource(DbTest, '/db')
+api.add_resource(Test, '/test')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
