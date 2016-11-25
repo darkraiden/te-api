@@ -55,7 +55,7 @@ class DbTest(Resource):
     def get(self):
         try:
             connection = Connection()
-            query = connection.doQuery()
+            query = connection.selectQuery()
             connection.dbDisconnect()
         except ValueError as err:
             return err.args
