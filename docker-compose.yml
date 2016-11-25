@@ -1,0 +1,24 @@
+---
+
+version: '2'
+services:
+  api:
+    build:
+      dockerfile: dockerfiles/Dockerfile-api
+      context: ./
+    volumes:
+      - "./src:/srv/api/"
+      - "./bin:/srv/api/bin/"
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    command: "/srv/api/bin/bootstrap.sh"
+  mysql:
+    build:
+      dockerfile: dockerfiles/Dockerfile-mysql
+      context: ./
+    ports:
+      - "3306:3306"

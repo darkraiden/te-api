@@ -1,0 +1,8 @@
+FROM mysql
+
+ENV MYSQL_USER thousandEyes
+ENV MYSQL_PASSWORD sup3rs3cr3t
+ENV MYSQL_DATABASE thousandEyes
+ENV MYSQL_ROOT_PASSWORD root
+
+COPY db/thousandEyes.sql /docker-entrypoint-initdb.d/
