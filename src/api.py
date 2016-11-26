@@ -37,7 +37,10 @@ def convertToJson(xml):
 
 def getUrl(url):
     req_time = time.time()
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except Exception as error:
+        raise error.args
     resp_time = time.time()
     return response
 
