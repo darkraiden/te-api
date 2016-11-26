@@ -43,13 +43,14 @@ def convertToJson(xml):
     except Exception as err:
         raise err.args
 
-def getUrl(url):
+def getUrl(url, conn):
     req_time = time.time()
     try:
         response = requests.get(url)
     except Exception as error:
         raise error.args
     resp_time = time.time()
+    conn.dbInsert(url, req_time, resp_time)
     return response
 
 # Class for DB interactions
@@ -79,11 +80,11 @@ class DbWrapper():
             raise ValueError("Error! Unable to fetch data!")
     def dbInsert(self, e, trq, trs):
         try:
-            self.conn.cursor.execute('INSERT INTO statistics (endpoint, timerequest, timeresponse) VALUES (%s, %s, %s)', (e, trq, trs))
+            self.conn.cursor.execute("INSERT INTO statistics (endpoint, timerequest, timeresponse) VALUES (%s, %s, %s)", (e, trq, trs))
             self.conn.dbDisconnect()
         except Exception as err:
             self.conn.dbDisconnect()
-            raise err.args
+            raise ValueError("Error! Unable to write to the database!")
 
 class DbTest(Resource):
     def get(self):
@@ -96,14 +97,15 @@ class DbTest(Resource):
 
 class Test(Resource):
     def get(self):
+        conn = DbWrapper()
         r = getArgs('r')
-        response = getUrl(commands['schedule'] + "&a=" + agency + "&r=" + r)
+        response = getUrl(commands['schedule'] + "&a=" + agency + "&r=" + r, conn)
         return convertToJson(response.content)
 
-class RouteList(Resource):
-    def get(self):
-        response = getUrl(commands['routeList'] + "&a=" + agency)
-        return convertToJson(response.content)
+# class RouteList(Resource):
+#     def get(self):
+#         response = getUrl(commands['routeList'] + "&a=" + agency)
+#         return convertToJson(response.content)
 
 
 class DumpServices(Resource):
@@ -113,7 +115,7 @@ class DumpServices(Resource):
 api.add_resource(DumpServices, '/dumpServices')
 api.add_resource(DbTest, '/db')
 api.add_resource(Test, '/test')
-api.add_resource(RouteList, '/routes')
+# api.add_resource(RouteList, '/routes')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

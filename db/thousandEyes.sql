@@ -12,10 +12,10 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `statistics` (
-	`ID` numeric NOT NULL,
+	`ID` INT NOT NULL AUTO_INCREMENT,
 	`endpoint` TEXT NOT NULL,
-	`timerequest` TIME NOT NULL,
-	`timeresponse` TIME NOT NULL,
+	`timerequest` FLOAT NOT NULL,
+	`timeresponse` FLOAT NOT NULL,
 	PRIMARY KEY (`ID`)
 );
 
