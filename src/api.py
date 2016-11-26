@@ -58,16 +58,9 @@ class Connection():
     def __init__(self):
         try:
             self.connection = MySQLdb.connect(host=db_hostname, user=db_username, passwd=db_password, db=db_name)
+            self.cursor = self.connection.cursor()
         except Exception as error:
             raise ValueError("Error! Unable to connect to the Database!")
-    def selectQuery(self, query):
-        cursor = self.connection.cursor()
-        try:
-            cursor.execute(query)
-            result = cursor.fetchall()
-            return result
-        except:
-            raise ValueError("Error! Unable to fetch data!")
     def dbDisconnect(self):
         try:
             self.connection.close()
@@ -77,6 +70,14 @@ class Connection():
 class DbWrapper():
     def __init__(self):
         self.conn = Connection()
+    def selectAll(self):
+        try:
+            self.conn.cursor.execute('SELECT * FROM statistics')
+            result = self.conn.cursor.fetchall()
+            self.conn.dbDisconnect()
+            return result
+        except:
+            raise ValueError("Error! Unable to fetch data!")
     def selectQuery(self, query):
         cursor = self.conn.cursor()
         try:
@@ -90,8 +91,7 @@ class DbTest(Resource):
     def get(self):
         try:
             connection = DbWrapper()
-            query = connection.selectQuery(queries['selectAll'])
-            # connection.dbDisconnect()
+            query = connection.selectAll()
         except ValueError as err:
             return err.args
         return query
