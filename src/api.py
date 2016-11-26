@@ -31,6 +31,15 @@ queries = {
     "selectAll": "SELECT * FROM statistics"
 }
 
+def getArgs(r, e):
+    try:
+        p = reqparse.RequestParser()
+        p.add_argument(e)
+        args = p.parse_args()
+    except Exception as err:
+        raise err.args
+    return args.get(e)
+
 def convertToJson(xml):
     o = xmltodict.parse(xml)
     return o
@@ -89,7 +98,9 @@ class DbTest(Resource):
 
 class Test(Resource):
     def get(self):
-        response = getUrl(commands['agencyList'])
+        # parser = reqparse.RequestParser()
+        r = getArgs(self, 'r')
+        response = getUrl(commands['schedule'] + "&a=" + agency + "&r=" + r)
         return convertToJson(response.content)
 
 class RouteList(Resource):
