@@ -92,7 +92,7 @@ class Test(Resource):
 
 class RouteList(Resource):
     def get(self):
-        response = requests.get(commands['routeList'] + "&a=" + agency)
+        response = getUrl(commands['routeList'] + "&a=" + agency)
         return convertToJson(response.content)
 
 
