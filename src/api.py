@@ -85,7 +85,6 @@ class DbTest(Resource):
             # connection.dbDisconnect()
         except ValueError as err:
             return err.args
-
         return query
 
 class Test(Resource):
