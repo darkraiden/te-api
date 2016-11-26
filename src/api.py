@@ -4,6 +4,7 @@ import requests
 import MySQLdb
 import xml.etree.ElementTree as ET
 import xmltodict, json
+import time
 
 app = Flask(__name__)
 api = Api(app)
@@ -80,7 +81,9 @@ class DbTest(Resource):
 
 class Test(Resource):
     def get(self):
+        req_time = time.time()
         response = requests.get(commands['agencyList'])
+        resp_time = time.time()
         return convertToJson(response.content)
 
 class RouteList(Resource):
