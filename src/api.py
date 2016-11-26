@@ -83,6 +83,11 @@ class Test(Resource):
         response = requests.get(commands['agencyList'])
         return convertToJson(response.content)
 
+class RouteList(Resource):
+    def get(self):
+        response = requests.get(commands['routeList'] + "&a=" + agency)
+        return convertToJson(response.content)
+
 
 class DumpServices(Resource):
     def get(self):
@@ -91,6 +96,7 @@ class DumpServices(Resource):
 api.add_resource(DumpServices, '/dumpServices')
 api.add_resource(DbTest, '/db')
 api.add_resource(Test, '/test')
+api.add_resource(RouteList, '/routes')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
