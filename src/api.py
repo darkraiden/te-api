@@ -27,7 +27,7 @@ commands = {
     "vehicleLocations": "http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations"
 }
 
-def getArgs(r, e):
+def getArgs(e):
     try:
         p = reqparse.RequestParser()
         p.add_argument(e)
@@ -37,8 +37,11 @@ def getArgs(r, e):
     return args.get(e)
 
 def convertToJson(xml):
-    o = xmltodict.parse(xml)
-    return o
+    try:
+        o = xmltodict.parse(xml)
+        return o
+    except Exception as err:
+        raise err.args
 
 def getUrl(url):
     req_time = time.time()
@@ -76,10 +79,10 @@ class DbWrapper():
             raise ValueError("Error! Unable to fetch data!")
     def dbInsert(self, e, trq, trs):
         try:
-            self.conn.cursor.execute('INSERT INTO statistics (endpoint, timerequest, timeresponse) VALUES (e, trq, trs)')
+            self.conn.cursor.execute('INSERT INTO statistics (endpoint, timerequest, timeresponse) VALUES (%s, %s, %s)', (e, trq, trs))
             self.conn.dbDisconnect()
-            return True
         except Exception as err:
+            self.conn.dbDisconnect()
             raise err.args
 
 class DbTest(Resource):
@@ -93,7 +96,7 @@ class DbTest(Resource):
 
 class Test(Resource):
     def get(self):
-        r = getArgs(self, 'r')
+        r = getArgs('r')
         response = getUrl(commands['schedule'] + "&a=" + agency + "&r=" + r)
         return convertToJson(response.content)
 
