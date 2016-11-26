@@ -35,6 +35,12 @@ def convertToJson(xml):
     o = xmltodict.parse(xml)
     return o
 
+def getUrl(url):
+    req_time = time.time()
+    response = requests.get(url)
+    resp_time = time.time()
+    return response
+
 # Class for DB interactions
 class Connection():
     def __init__(self):
@@ -81,9 +87,7 @@ class DbTest(Resource):
 
 class Test(Resource):
     def get(self):
-        req_time = time.time()
-        response = requests.get(commands['agencyList'])
-        resp_time = time.time()
+        response = getUrl(commands['agencyList'])
         return convertToJson(response.content)
 
 class RouteList(Resource):
