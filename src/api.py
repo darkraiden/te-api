@@ -98,7 +98,6 @@ class DbTest(Resource):
 
 class Test(Resource):
     def get(self):
-        # parser = reqparse.RequestParser()
         r = getArgs(self, 'r')
         response = getUrl(commands['schedule'] + "&a=" + agency + "&r=" + r)
         return convertToJson(response.content)
