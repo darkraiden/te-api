@@ -27,10 +27,6 @@ commands = {
     "vehicleLocations": "http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations"
 }
 
-queries = {
-    "selectAll": "SELECT * FROM statistics"
-}
-
 def getArgs(r, e):
     try:
         p = reqparse.RequestParser()
