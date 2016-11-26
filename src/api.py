@@ -78,14 +78,13 @@ class DbWrapper():
             return result
         except:
             raise ValueError("Error! Unable to fetch data!")
-    def selectQuery(self, query):
-        cursor = self.conn.cursor()
+    def dbInsert(self, e, trq, trs):
         try:
-            cursor.execute(query)
-            result = cursor.fetchall()
-            return result
-        except:
-            raise ValueError("Error! Unable to fetch data!")
+            self.conn.cursor.execute('INSERT INTO statistics (endpoint, timerequest, timeresponse) VALUES (e, trq, trs)')
+            self.conn.dbDisconnect()
+            return True
+        except Exception as err:
+            raise err.args
 
 class DbTest(Resource):
     def get(self):
