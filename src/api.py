@@ -119,7 +119,6 @@ class DbWrapper():
             raise ValueError(err.args)
     def dbSlowQueries(self):
         try:
-            # self.conn.cursor.execute("SELECT (endpoint, totaltime) FROM statistics WHEN statistics.totaltime > %s", float(queryThreshold))
             self.conn.cursor.execute("SELECT endpoint, totaltime FROM statistics WHERE statistics.totaltime > %s", queryThreshold)
             result = self.conn.cursor.fetchall()
             self.conn.dbDisconnect()
