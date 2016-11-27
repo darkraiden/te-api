@@ -118,7 +118,7 @@ class Redis():
         return result
     def setExpire(self, k):
         try:
-            self.r.setex(k, 30)
+            self.r.expire(k, 30)
         except Exception as err:
             raise ValueError(err.args)
 
@@ -208,6 +208,7 @@ class Test(Resource):
         response = getUrl(commands['schedule'] + "&a=" + agency, conn)
         r.setKey('test')
         app.logger.info(r.getKey('test') == 'True')
+        r.setExpire('test')
         return convertToJson(response.content)
 
 class RouteList(Resource):
