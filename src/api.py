@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_restful import reqparse, abort, Api, Resource
 import requests
 import MySQLdb
@@ -81,7 +81,7 @@ class DbWrapper():
             self.conn.cursor.execute('SELECT * FROM statistics')
             result = self.conn.cursor.fetchall()
             self.conn.dbDisconnect()
-            return json.dumps(result)
+            return result
         except:
             raise ValueError("Error! Unable to fetch data!")
     def dbInsert(self, e, trq, trs):
@@ -100,7 +100,7 @@ class DbTest(Resource):
             query = connection.selectAll()
         except ValueError as err:
             return err.args
-        return query
+        return jsonify(query)
 
 class Test(Resource):
     def get(self):
@@ -108,6 +108,7 @@ class Test(Resource):
         r = getArgs('r')
         response = getUrl(commands['schedule'] + "&a=" + agency + "&r=" + r, conn)
         return convertToJson(response.content)
+        # return jsonify(request.args.lists())
 
 class RouteList(Resource):
     def get(self):
