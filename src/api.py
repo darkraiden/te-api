@@ -67,6 +67,12 @@ class Connection():
         except:
             raise ValueError("Error! Unable to close the DB connection")
 
+    def dbCommit(self):
+        try:
+            self.connection.commit()
+        except:
+            raise ValueError("Error! Unable to commit your query!")
+
 class DbWrapper():
     def __init__(self):
         self.conn = Connection()
@@ -75,16 +81,17 @@ class DbWrapper():
             self.conn.cursor.execute('SELECT * FROM statistics')
             result = self.conn.cursor.fetchall()
             self.conn.dbDisconnect()
-            return result
+            return json.dumps(result)
         except:
             raise ValueError("Error! Unable to fetch data!")
     def dbInsert(self, e, trq, trs):
         try:
             self.conn.cursor.execute("INSERT INTO statistics (endpoint, timerequest, timeresponse) VALUES (%s, %s, %s)", (e, trq, trs))
+            self.conn.dbCommit()
             self.conn.dbDisconnect()
         except Exception as err:
             self.conn.dbDisconnect()
-            raise ValueError("Error! Unable to write to the database!")
+            raise ValueError(err.args)
 
 class DbTest(Resource):
     def get(self):
