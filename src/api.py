@@ -109,6 +109,13 @@ class Redis():
         except Exception as err:
             raise ValueError(err.args)
         app.logger.info('Set Redis key: %s', k)
+    def getKey(self, k):
+        try:
+            result = self.r.get(k)
+        except Exception as err:
+            raise ValueError(err.args)
+        app.logger.info('Redis value of %s is %s', k, result)
+        return result
 
 # Class for DB interactions
 class Connection():
@@ -195,6 +202,7 @@ class Test(Resource):
         r = Redis()
         response = getUrl(commands['schedule'] + "&a=" + agency, conn)
         r.setKey('test')
+        app.logger.info(r.getKey('test') == 'True')
         return convertToJson(response.content)
 
 class RouteList(Resource):
