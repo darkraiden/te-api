@@ -7,6 +7,7 @@ import xmltodict, json
 import unicodedata
 import time
 import datetime as dt
+import redis as redis
 
 app = Flask(__name__)
 api = Api(app)
@@ -71,14 +72,14 @@ def secondsDiff(t1, t2):
     return total
 
 def getUrl(url, conn):
-    p = []
+    # p = []
     req_time = time.time()
-    p.append(convertTimestamp(req_time))
-    app.logger.info("This is the request time(now): %s", p[0])
-    p.append(convertTimestamp(float(parseString(conn.dbGetLastEndpoint(url)))))
-    app.logger.info("This is the time from the DB: %s", p[1])
-    elapsed = p[0] - p[1]
-    app.logger.info(elapsed > dt.timedelta(seconds=30))
+    # p.append(convertTimestamp(req_time))
+    # app.logger.info("This is the request time(now): %s", p[0])
+    # p.append(convertTimestamp(float(parseString(conn.dbGetLastEndpoint(url)))))
+    # app.logger.info("This is the time from the DB: %s", p[1])
+    # elapsed = p[0] - p[1]
+    # app.logger.info(elapsed > dt.timedelta(seconds=30))
     # app.logger.info(secondsDiff(req_time, float(last_query)))
     try:
         response = requests.get(url)
