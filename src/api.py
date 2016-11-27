@@ -116,6 +116,11 @@ class Redis():
             raise ValueError(err.args)
         app.logger.info('Redis value of %s is %s', k, result)
         return result
+    def setExpire(self, k):
+        try:
+            self.r.setex(k, 30)
+        except Exception as err:
+            raise ValueError(err.args)
 
 # Class for DB interactions
 class Connection():
