@@ -19,6 +19,9 @@ db_username = 'thousandEyes'
 db_password = 'sup3rs3cr3t'
 db_name = 'thousandEyes'
 
+redis_host = 'redis'
+redis_port = '6379'
+
 queryThreshold = "5"
 
 commands = {
@@ -92,6 +95,20 @@ def getUrl(url, conn):
         raise ValueError(err.args)
     conn.dbInsert(url, req_time, resp_time, tot_sec)
     return response
+
+# Class for Redis Interactions
+class Redis():
+    def __init__(self):
+        try:
+            self.r = redis.StrictRedis(host=redis_host, port=redis_port, db=0)
+        except Exception as err:
+            raise ValueError(err.args)
+    def setKey(self, k):
+        try:
+            self.r.set(k, True)
+        except Exception as err:
+            raise ValueError(err.args)
+        app.logger.info('Set Redis key: %s', k)
 
 # Class for DB interactions
 class Connection():
@@ -174,8 +191,10 @@ class DbTest(Resource):
 class Test(Resource):
     def get(self):
         conn = DbWrapper()
-        r = getArgs('r')
-        response = getUrl(commands['schedule'] + "&a=" + agency + "&r=" + r, conn)
+        res = getArgs('r')
+        r = Redis()
+        response = getUrl(commands['schedule'] + "&a=" + agency, conn)
+        r.setKey('test')
         return convertToJson(response.content)
 
 class RouteList(Resource):
