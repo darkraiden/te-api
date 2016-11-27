@@ -45,7 +45,7 @@ def getAllArgs(args):
             string += string.join(k) + "=" + string.join(v) + "&"
     except Exception as err:
         raise ValueError(err.args)
-    app.logger.info(string)
+    app.logger.info("Args are: " + string)
     return string 
 
 def convertToJson(xml):
@@ -151,6 +151,13 @@ class AgencyList(Resource):
         response = getUrl(commands['agencyList'], conn)
         return convertToJson(response.content)
 
+class GenericUrl(Resource):
+    def get(self, uri):
+        conn = DbWrapper()
+        args = getAllArgs(dict(request.args.lists()))
+        response = getUrl(commands[uri] + "&a=" + agency + "&" + str(args), conn)
+        return convertToJson(response.content)
+
 
 class DumpServices(Resource):
     def get(self):
@@ -161,6 +168,7 @@ api.add_resource(DbTest, '/db')
 api.add_resource(Test, '/test')
 api.add_resource(AgencyList, '/agencyList')
 api.add_resource(RouteList, '/routeList')
+api.add_resource(GenericUrl, '/<string:uri>')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
