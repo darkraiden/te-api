@@ -16,6 +16,7 @@ CREATE TABLE `statistics` (
 	`endpoint` TEXT NOT NULL,
 	`timerequest` FLOAT NOT NULL,
 	`timeresponse` FLOAT NOT NULL,
+	`totaltime` FLOAT NOT NULL,
 	PRIMARY KEY (`ID`)
 );
 
