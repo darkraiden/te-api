@@ -18,6 +18,8 @@ db_username = 'thousandEyes'
 db_password = 'sup3rs3cr3t'
 db_name = 'thousandEyes'
 
+queryThreshold = 2
+
 commands = {
     "agencyList": "http://webservices.nextbus.com/service/publicXMLFeed?command=agencyList",
     "routeList": "http://webservices.nextbus.com/service/publicXMLFeed?command=routeList",
@@ -115,6 +117,16 @@ class DbWrapper():
         except Exception as err:
             self.conn.dbDisconnect()
             raise ValueError(err.args)
+    def dbSlowQueries(self):
+        try:
+            # self.conn.cursor.execute("SELECT (endpoint, totaltime) FROM statistics WHEN statistics.totaltime > %s", float(queryThreshold))
+            self.conn.cursor.execute("SELECT endpoint, totaltime FROM statistics WHERE statistics.totaltime > " + str(queryThreshold))
+            result = self.conn.cursor.fetchall()
+            self.conn.dbDisconnect()
+        except Exception as err:
+            self.conn.dbDisconnect()
+            raise ValueError(err.args)
+        return result
 
 class DbTest(Resource):
     def get(self):
@@ -158,6 +170,12 @@ class GenericUrl(Resource):
         response = getUrl(commands[uri] + "&a=" + agency + "&" + str(args), conn)
         return convertToJson(response.content)
 
+class SlowQueries(Resource):
+    def get(self):
+        conn = DbWrapper()
+        query = conn.dbSlowQueries()
+        return jsonify(query)
+
 
 class DumpServices(Resource):
     def get(self):
@@ -169,6 +187,7 @@ api.add_resource(Test, '/test')
 api.add_resource(AgencyList, '/agencyList')
 api.add_resource(RouteList, '/routeList')
 api.add_resource(GenericUrl, '/<string:uri>')
+api.add_resource(SlowQueries, '/stats/slowQueries')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
