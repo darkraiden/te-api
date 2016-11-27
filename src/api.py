@@ -143,13 +143,6 @@ class Test(Resource):
         r = getArgs('r')
         response = getUrl(commands['schedule'] + "&a=" + agency + "&r=" + r, conn)
         return convertToJson(response.content)
-        # return jsonify(request.args.lists())
-
-# class Test(Resource):
-#     def get(self):
-#         string = ""
-#         args = dict(request.args.lists())
-#         return getAllArgs(args)
 
 class RouteList(Resource):
     def get(self):
