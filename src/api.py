@@ -55,6 +55,13 @@ def convertToJson(xml):
     except Exception as err:
         raise err.args
 
+def secondsDiff(t1, t2):
+    a = dt.datetime.fromtimestamp(t1)
+    b = dt.datetime.fromtimestamp(t2)
+    total = (b - a).total_seconds()
+    app.logger.info("This request took %s seconds", total)
+    return total
+
 def getUrl(url, conn):
     req_time = time.time()
     try:
@@ -62,7 +69,11 @@ def getUrl(url, conn):
     except Exception as error:
         raise error.args
     resp_time = time.time()
-    conn.dbInsert(url, req_time, resp_time)
+    try:
+        tot_sec = secondsDiff(req_time, resp_time)
+    except Exception as err:
+        raise ValueError(err.args)
+    conn.dbInsert(url, req_time, resp_time, tot_sec)
     return response
 
 # Class for DB interactions
@@ -96,9 +107,9 @@ class DbWrapper():
             return result
         except:
             raise ValueError("Error! Unable to fetch data!")
-    def dbInsert(self, e, trq, trs):
+    def dbInsert(self, e, trq, trs, tsc):
         try:
-            self.conn.cursor.execute("INSERT INTO statistics (endpoint, timerequest, timeresponse) VALUES (%s, %s, %s)", (e, trq, trs))
+            self.conn.cursor.execute("INSERT INTO statistics (endpoint, timerequest, timeresponse, totaltime) VALUES (%s, %s, %s, %s)", (e, trq, trs, tsc))
             self.conn.dbCommit()
             self.conn.dbDisconnect()
         except Exception as err:
@@ -114,19 +125,19 @@ class DbTest(Resource):
             return err.args
         return jsonify(query)
 
-# class Test(Resource):
-#     def get(self):
-#         conn = DbWrapper()
-#         r = getArgs('r')
-#         response = getUrl(commands['schedule'] + "&a=" + agency + "&r=" + r, conn)
-#         return convertToJson(response.content)
-#         # return jsonify(request.args.lists())
-
 class Test(Resource):
     def get(self):
-        string = ""
-        args = dict(request.args.lists())
-        return getAllArgs(args)
+        conn = DbWrapper()
+        r = getArgs('r')
+        response = getUrl(commands['schedule'] + "&a=" + agency + "&r=" + r, conn)
+        return convertToJson(response.content)
+        # return jsonify(request.args.lists())
+
+# class Test(Resource):
+#     def get(self):
+#         string = ""
+#         args = dict(request.args.lists())
+#         return getAllArgs(args)
 
 class RouteList(Resource):
     def get(self):
