@@ -18,7 +18,7 @@ db_username = 'thousandEyes'
 db_password = 'sup3rs3cr3t'
 db_name = 'thousandEyes'
 
-queryThreshold = 2
+queryThreshold = "5"
 
 commands = {
     "agencyList": "http://webservices.nextbus.com/service/publicXMLFeed?command=agencyList",
@@ -120,7 +120,7 @@ class DbWrapper():
     def dbSlowQueries(self):
         try:
             # self.conn.cursor.execute("SELECT (endpoint, totaltime) FROM statistics WHEN statistics.totaltime > %s", float(queryThreshold))
-            self.conn.cursor.execute("SELECT endpoint, totaltime FROM statistics WHERE statistics.totaltime > " + str(queryThreshold))
+            self.conn.cursor.execute("SELECT endpoint, totaltime FROM statistics WHERE statistics.totaltime > %s", queryThreshold)
             result = self.conn.cursor.fetchall()
             self.conn.dbDisconnect()
         except Exception as err:
