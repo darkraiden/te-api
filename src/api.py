@@ -4,7 +4,9 @@ import requests
 import MySQLdb
 import xml.etree.ElementTree as ET
 import xmltodict, json
+import unicodedata
 import time
+import datetime as dt
 
 app = Flask(__name__)
 api = Api(app)
@@ -35,6 +37,16 @@ def getArgs(e):
     except Exception as err:
         raise err.args
     return args.get(e)
+
+def getAllArgs(args):
+    string = ""
+    try:
+       for k, v in args.iteritems():
+            string += string.join(k) + "=" + string.join(v) + "&"
+    except Exception as err:
+        raise ValueError(err.args)
+    app.logger.info(string)
+    return string 
 
 def convertToJson(xml):
     try:
@@ -102,13 +114,19 @@ class DbTest(Resource):
             return err.args
         return jsonify(query)
 
+# class Test(Resource):
+#     def get(self):
+#         conn = DbWrapper()
+#         r = getArgs('r')
+#         response = getUrl(commands['schedule'] + "&a=" + agency + "&r=" + r, conn)
+#         return convertToJson(response.content)
+#         # return jsonify(request.args.lists())
+
 class Test(Resource):
     def get(self):
-        conn = DbWrapper()
-        r = getArgs('r')
-        response = getUrl(commands['schedule'] + "&a=" + agency + "&r=" + r, conn)
-        return convertToJson(response.content)
-        # return jsonify(request.args.lists())
+        string = ""
+        args = dict(request.args.lists())
+        return getAllArgs(args)
 
 class RouteList(Resource):
     def get(self):
