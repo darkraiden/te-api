@@ -75,6 +75,11 @@ def secondsDiff(t1, t2):
     return total
 
 def getUrl(url, conn):
+    r = Redis()
+    if r.getKey(url) != None:
+        raise ValueError("Don't stress NextBus API too much: only one request every 30 seconds allowed!")
+    r.setKey(url)
+    r.setExpire(url)
     req_time = time.time()
     try:
         response = requests.get(url)
@@ -113,6 +118,7 @@ class Redis():
             self.r.expire(k, 30)
         except Exception as err:
             raise ValueError(err.args)
+        
 
 # Class for DB interactions
 class Connection():
