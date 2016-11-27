@@ -109,10 +109,11 @@ class Test(Resource):
         response = getUrl(commands['schedule'] + "&a=" + agency + "&r=" + r, conn)
         return convertToJson(response.content)
 
-# class RouteList(Resource):
-#     def get(self):
-#         response = getUrl(commands['routeList'] + "&a=" + agency)
-#         return convertToJson(response.content)
+class RouteList(Resource):
+    def get(self):
+        conn = DbWrapper()
+        response = getUrl(commands['routeList'] + "&a=" + agency, conn)
+        return convertToJson(response.content)
 
 
 class DumpServices(Resource):
@@ -122,7 +123,7 @@ class DumpServices(Resource):
 api.add_resource(DumpServices, '/dumpServices')
 api.add_resource(DbTest, '/db')
 api.add_resource(Test, '/test')
-# api.add_resource(RouteList, '/routes')
+api.add_resource(RouteList, '/routes')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
