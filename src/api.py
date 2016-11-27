@@ -127,6 +127,16 @@ class DbWrapper():
             raise ValueError(err.args)
         return result
 
+    def dbNumQueries(self):
+        try:
+            self.conn.cursor.execute("SELECT endpoint, count(*) AS tot FROM statistics GROUP BY endpoint")
+            result = self.conn.cursor.fetchall()
+            self.conn.dbDisconnect()
+        except Exception as err:
+            self.conn.dbDisconnect()
+            raise ValueError(err.args)
+        return result
+
 class DbTest(Resource):
     def get(self):
         try:
@@ -168,6 +178,12 @@ class SlowQueries(Resource):
         query = conn.dbSlowQueries()
         return jsonify(query)
 
+class NumOfQueries(Resource):
+    def get(self):
+        conn = DbWrapper()
+        query = conn.dbNumQueries()
+        return jsonify(query)
+
 
 class DumpServices(Resource):
     def get(self):
@@ -180,6 +196,7 @@ api.add_resource(AgencyList, '/agencyList')
 api.add_resource(RouteList, '/routeList')
 api.add_resource(GenericUrl, '/<string:uri>')
 api.add_resource(SlowQueries, '/stats/slowQueries')
+api.add_resource(NumOfQueries, '/stats/numOfQueries')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
