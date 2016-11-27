@@ -40,6 +40,9 @@ def getArgs(e):
         raise err.args
     return args.get(e)
 
+def parseString(s):
+    return s.replace("(", "").replace(")", "").replace(",", "").replace("[", "").replace("]", "")
+
 def getAllArgs(args):
     string = ""
     try:
@@ -57,15 +60,26 @@ def convertToJson(xml):
     except Exception as err:
         raise err.args
 
+def convertTimestamp(x):
+    return dt.datetime.fromtimestamp(x)
+
 def secondsDiff(t1, t2):
-    a = dt.datetime.fromtimestamp(t1)
-    b = dt.datetime.fromtimestamp(t2)
+    a = convertTimestamp(t1)
+    b = convertTimestamp(t2)
     total = (b - a).total_seconds()
     app.logger.info("This request took %s seconds", total)
     return total
 
 def getUrl(url, conn):
+    p = []
     req_time = time.time()
+    p.append(convertTimestamp(req_time))
+    app.logger.info("This is the request time(now): %s", p[0])
+    p.append(convertTimestamp(float(parseString(conn.dbGetLastEndpoint(url)))))
+    app.logger.info("This is the time from the DB: %s", p[1])
+    elapsed = p[0] - p[1]
+    app.logger.info(elapsed > dt.timedelta(seconds=30))
+    # app.logger.info(secondsDiff(req_time, float(last_query)))
     try:
         response = requests.get(url)
     except Exception as error:
@@ -136,6 +150,16 @@ class DbWrapper():
             self.conn.dbDisconnect()
             raise ValueError(err.args)
         return result
+
+    def dbGetLastEndpoint(self, e):
+        try:
+            self.conn.cursor.execute("SELECT timerequest FROM statistics WHERE endpoint = '" + e + "' ORDER BY ID DESC LIMIT 1")
+            result = list(self.conn.cursor.fetchall())
+        except Exception as err:
+            self.conn.dbDisconnect()
+            raise ValueError(err.args)
+        self.conn.dbDisconnect()
+        return str(result)
 
 class DbTest(Resource):
     def get(self):
