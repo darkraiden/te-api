@@ -235,6 +235,7 @@ api.add_resource(RouteList, '/routeList')
 api.add_resource(GenericUrl, '/<string:uri>')
 api.add_resource(SlowQueries, '/stats/slowQueries')
 api.add_resource(NumOfQueries, '/stats/numOfQueries')
+api.add_resource(NotRunning, '/notRunning')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
