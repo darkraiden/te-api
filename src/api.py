@@ -51,7 +51,7 @@ def getAllRoutes(r):
     routes = soup.body.find_all('route')
     for route in routes:
         p.append(route['tag'])
-    return p
+    return p[:]
 
 def getStopTimes(route, direction, p):
     if route['direction'] == direction and route['serviceClass'] == 'wkd':
