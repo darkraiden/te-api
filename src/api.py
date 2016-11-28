@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_restful import reqparse, abort, Api, Resource
 import requests
 import MySQLdb
+from bs4 import BeautifulSoup
 import xml.etree.ElementTree as ET
 import xmltodict, json
 import unicodedata
@@ -43,6 +44,14 @@ def getArgs(e):
     except Exception as err:
         raise err.args
     return args.get(e)
+
+def getAllRoutes(r):
+    p = []
+    soup = BeautifulSoup(r, 'xml')
+    routes = soup.body.find_all('route')
+    for route in routes:
+        p.append(route['tag'])
+    return p
 
 def parseString(s):
     return s.replace("(", "").replace(")", "").replace(",", "").replace("[", "").replace("]", "")
@@ -198,16 +207,23 @@ class DbTest(Resource):
             return err.args
         return jsonify(query)
 
+# class Test(Resource):
+#     def get(self):
+#         conn = DbWrapper()
+#         res = getArgs('r')
+#         r = Redis()
+#         response = getUrl(commands['schedule'] + "&a=" + agency, conn)
+#         r.setKey('test')
+#         app.logger.info(r.getKey('test') == 'True')
+#         r.setExpire('test')
+#         return convertToJson(response.content)
+
 class Test(Resource):
     def get(self):
         conn = DbWrapper()
-        res = getArgs('r')
-        r = Redis()
-        response = getUrl(commands['schedule'] + "&a=" + agency, conn)
-        r.setKey('test')
-        app.logger.info(r.getKey('test') == 'True')
-        r.setExpire('test')
-        return convertToJson(response.content)
+        response = getUrl(commands['routeList'] + "&a=" + agency, conn)
+        r_json = convertToJson(response.content)
+        return getAllRoutes(response.content)
 
 class RouteList(Resource):
     def get(self):
