@@ -67,14 +67,9 @@ def getNotRunning(routes, t):
     for route in routes:
         schedule = requests.get(commands['schedule'] + "&a=" + agency + "&r=" + route)
         inbound, outbound = getTimes(schedule.content)
-        in_start = convertEpoch(min(inbound))
-        in_end = convertEpoch(max(inbound))
-        out_start = convertEpoch(min(outbound))
-        out_end = convertEpoch(max(outbound))
-        is_running = max(in_start, out_start) < min(in_end, out_end)
-        if is_running:
-            break
-        else:
+        start = max(min(inbound), min(outbound))
+        end = min(max(inbound), max(outbound))
+        if time > start and time < end:
             not_running.append(route)
     return not_running[:]
 
