@@ -5,6 +5,7 @@ RUN pip install flask \
                 requests \
                 MySQL-python \
                 xmltodict \
+                lxml \
                 beautifulsoup4 \
                 redis \
                 pymysql

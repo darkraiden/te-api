@@ -53,6 +53,27 @@ def getAllRoutes(r):
         p.append(route['tag'])
     return p
 
+def getStopTimes(route, direction, p):
+    if route['direction'] == direction and route['serviceClass'] == 'wkd':
+        trs = route.find_all('tr')
+        for tr in trs:
+            stops = tr.find_all('stop')
+            for stop in stops:
+                if stop['epochTime'] != "-1":
+                    p.append(int(stop['epochTime']))
+    return p[:]
+
+def getTimes(t):
+    in_times = []
+    out_times = []
+    soup = BeautifulSoup(t, 'xml')
+    routes = soup.body.find_all('route')
+    for route in routes:
+        getStopTimes(route, 'Inbound', in_times)
+        getStopTimes(route, 'Outbound', out_times)
+    return sorted(in_times[:]), sorted(out_times[:])
+
+
 def parseString(s):
     return s.replace("(", "").replace(")", "").replace(",", "").replace("[", "").replace("]", "")
 
@@ -220,10 +241,14 @@ class DbTest(Resource):
 
 class Test(Resource):
     def get(self):
+        inbound = []
+        outbound = []
         conn = DbWrapper()
-        response = getUrl(commands['routeList'] + "&a=" + agency, conn)
+        response = getUrl(commands['schedule'] + "&a=" + agency + "&r=6", conn)
         r_json = convertToJson(response.content)
-        return getAllRoutes(response.content)
+        inbound, outbound = getTimes(response.content)
+        return inbound
+        # return getTimes(response.content)
 
 class RouteList(Resource):
     def get(self):
