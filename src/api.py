@@ -37,7 +37,7 @@ def getArgs(e):
         p.add_argument(e)
         args = p.parse_args()
     except Exception as err:
-        raise err.args
+        raise ValueError(err.args)
     return args.get(e)
 
 def getAllRoutes(r):
