@@ -56,6 +56,28 @@ def getAllRoutes(r):
 def getMinMax(p):
     return min(p), max(p)
 
+def convertEpoch(t):
+    return time.strftime('%H:%M:%S', time.localtime(t))
+
+def getNotRunning(routes, t):
+    not_running = []
+    inbound = []
+    outbound = []
+    time = convertEpoch(t)
+    for route in routes:
+        schedule = requests.get(commands['schedule'] + "&a=" + agency + "&r=" + route)
+        inbound, outbound = getTimes(schedule.content)
+        in_start = convertEpoch(min(inbound))
+        in_end = convertEpoch(max(inbound))
+        out_start = convertEpoch(min(outbound))
+        out_end = convertEpoch(max(outbound))
+        is_running = max(in_start, out_start) < min(in_end, out_end)
+        if is_running:
+            break
+        else:
+            not_running.append(route)
+    return not_running[:]
+
 def getStopTimes(route, direction, p):
     if route['direction'] == direction and route['serviceClass'] == 'wkd':
         trs = route.find_all('tr')
