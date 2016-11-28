@@ -215,6 +215,13 @@ class NumOfQueries(Resource):
         query = conn.dbNumQueries()
         return jsonify(query)
 
+class NotRunning(Resource):
+    def get(self):
+        conn = mysql.DbWrapper()
+        arg = str(getArgs('t'))
+        response = getUrl(base_url + commands['routeList'] + "&a=" + agency, conn)
+        return getNotRunning(response.content, arg)
+
 
 class DumpServices(Resource):
     def get(self):
