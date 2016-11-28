@@ -18,15 +18,17 @@ agency = 'sf-muni'
 redis_host = 'redis'
 redis_port = '6379'
 
+base_url = "http://webservices.nextbus.com/service/publicXMLFeed?command="
+
 commands = {
-    "agencyList": "http://webservices.nextbus.com/service/publicXMLFeed?command=agencyList",
-    "routeList": "http://webservices.nextbus.com/service/publicXMLFeed?command=routeList",
-    "routeConfig": "http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig",
-    "predictions": "http://webservices.nextbus.com/service/publicXMLFeed?command=predictions",
-    "predictionsForMultiStops": "http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops",
-    "schedule": "http://webservices.nextbus.com/service/publicXMLFeed?command=schedule",
-    "messages": "http://webservices.nextbus.com/service/publicXMLFeed?command=messages",
-    "vehicleLocations": "http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations"
+    "agencyList": "agencyList",
+    "routeList": "routeList",
+    "routeConfig": "routeConfig",
+    "predictions": "predictions",
+    "predictionsForMultiStops": "predictionsForMultiStops",
+    "schedule": "schedule",
+    "messages": "messages",
+    "vehicleLocations": "vehicleLocations"
 }
 
 def getArgs(e):
@@ -58,7 +60,7 @@ def getNotRunning(routes, t):
     outbound = []
     time = convertEpoch(t)
     for route in routes:
-        schedule = requests.get(commands['schedule'] + "&a=" + agency + "&r=" + route)
+        schedule = requests.get(base_url + commands['schedule'] + "&a=" + agency + "&r=" + route)
         inbound, outbound = getTimes(schedule.content)
         start = max(min(inbound), min(outbound))
         end = min(max(inbound), max(outbound))
@@ -187,7 +189,7 @@ class Test(Resource):
         inbound = []
         outbound = []
         conn = mysql.DbWrapper()
-        response = getUrl(commands['schedule'] + "&a=" + agency + "&r=6", conn)
+        response = getUrl(base_url + commands['schedule'] + "&a=" + agency + "&r=6", conn)
         r_json = convertToJson(response.content)
         inbound, outbound = getTimes(response.content)
         return inbound
@@ -196,20 +198,20 @@ class Test(Resource):
 class RouteList(Resource):
     def get(self):
         conn = mysql.DbWrapper()
-        response = getUrl(commands['routeList'] + "&a=" + agency, conn)
+        response = getUrl(base_url + commands['routeList'] + "&a=" + agency, conn)
         return convertToJson(response.content)
 
 class AgencyList(Resource):
     def get(self):
         conn = mysql.DbWrapper()
-        response = getUrl(commands['agencyList'], conn)
+        response = getUrl(base_url + commands['agencyList'], conn)
         return convertToJson(response.content)
 
 class GenericUrl(Resource):
     def get(self, uri):
         conn = mysql.DbWrapper()
         args = getAllArgs(dict(request.args.lists()))
-        response = getUrl(commands[uri] + "&a=" + agency + "&" + str(args), conn)
+        response = getUrl(base_url + commands[uri] + "&a=" + agency + "&" + str(args), conn)
         return convertToJson(response.content)
 
 class SlowQueries(Resource):
