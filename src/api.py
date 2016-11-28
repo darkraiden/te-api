@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_restful import reqparse, abort, Api, Resource
 import requests
-import MySQLdb
+import mysql as mysql
 from bs4 import BeautifulSoup
 import xml.etree.ElementTree as ET
 import xmltodict, json
@@ -15,15 +15,8 @@ api = Api(app)
 
 agency = 'sf-muni'
 
-db_hostname = 'mysql'
-db_username = 'thousandEyes'
-db_password = 'sup3rs3cr3t'
-db_name = 'thousandEyes'
-
 redis_host = 'redis'
 redis_port = '6379'
-
-queryThreshold = "5"
 
 commands = {
     "agencyList": "http://webservices.nextbus.com/service/publicXMLFeed?command=agencyList",
@@ -169,80 +162,10 @@ class Redis():
         except Exception as err:
             raise ValueError(err.args)
         
-
-# Class for DB interactions
-class Connection():
-    def __init__(self):
-        try:
-            self.connection = MySQLdb.connect(host=db_hostname, user=db_username, passwd=db_password, db=db_name)
-            self.cursor = self.connection.cursor()
-        except Exception as error:
-            raise ValueError("Error! Unable to connect to the Database!")
-    def dbDisconnect(self):
-        try:
-            self.connection.close()
-        except:
-            raise ValueError("Error! Unable to close the DB connection")
-
-    def dbCommit(self):
-        try:
-            self.connection.commit()
-        except:
-            raise ValueError("Error! Unable to commit your query!")
-
-class DbWrapper():
-    def __init__(self):
-        self.conn = Connection()
-    def selectAll(self):
-        try:
-            self.conn.cursor.execute('SELECT * FROM statistics')
-            result = self.conn.cursor.fetchall()
-            self.conn.dbDisconnect()
-            return result
-        except:
-            raise ValueError("Error! Unable to fetch data!")
-    def dbInsert(self, e, trq, trs, tsc):
-        try:
-            self.conn.cursor.execute("INSERT INTO statistics (endpoint, timerequest, timeresponse, totaltime) VALUES (%s, %s, %s, %s)", (e, trq, trs, tsc))
-            self.conn.dbCommit()
-            self.conn.dbDisconnect()
-        except Exception as err:
-            self.conn.dbDisconnect()
-            raise ValueError(err.args)
-    def dbSlowQueries(self):
-        try:
-            self.conn.cursor.execute("SELECT endpoint, totaltime FROM statistics WHERE statistics.totaltime > %s", queryThreshold)
-            result = self.conn.cursor.fetchall()
-            self.conn.dbDisconnect()
-        except Exception as err:
-            self.conn.dbDisconnect()
-            raise ValueError(err.args)
-        return result
-
-    def dbNumQueries(self):
-        try:
-            self.conn.cursor.execute("SELECT endpoint, count(*) AS tot FROM statistics GROUP BY endpoint")
-            result = self.conn.cursor.fetchall()
-            self.conn.dbDisconnect()
-        except Exception as err:
-            self.conn.dbDisconnect()
-            raise ValueError(err.args)
-        return result
-
-    def dbGetLastEndpoint(self, e):
-        try:
-            self.conn.cursor.execute("SELECT timerequest FROM statistics WHERE endpoint = '" + e + "' ORDER BY ID DESC LIMIT 1")
-            result = list(self.conn.cursor.fetchall())
-        except Exception as err:
-            self.conn.dbDisconnect()
-            raise ValueError(err.args)
-        self.conn.dbDisconnect()
-        return str(result)
-
 class DbTest(Resource):
     def get(self):
         try:
-            connection = DbWrapper()
+            connection = mysql.DbWrapper()
             query = connection.selectAll()
         except ValueError as err:
             return err.args
@@ -250,7 +173,7 @@ class DbTest(Resource):
 
 # class Test(Resource):
 #     def get(self):
-#         conn = DbWrapper()
+#         conn = mysql.DbWrapper()
 #         res = getArgs('r')
 #         r = Redis()
 #         response = getUrl(commands['schedule'] + "&a=" + agency, conn)
@@ -263,7 +186,7 @@ class Test(Resource):
     def get(self):
         inbound = []
         outbound = []
-        conn = DbWrapper()
+        conn = mysql.DbWrapper()
         response = getUrl(commands['schedule'] + "&a=" + agency + "&r=6", conn)
         r_json = convertToJson(response.content)
         inbound, outbound = getTimes(response.content)
@@ -272,32 +195,32 @@ class Test(Resource):
 
 class RouteList(Resource):
     def get(self):
-        conn = DbWrapper()
+        conn = mysql.DbWrapper()
         response = getUrl(commands['routeList'] + "&a=" + agency, conn)
         return convertToJson(response.content)
 
 class AgencyList(Resource):
     def get(self):
-        conn = DbWrapper()
+        conn = mysql.DbWrapper()
         response = getUrl(commands['agencyList'], conn)
         return convertToJson(response.content)
 
 class GenericUrl(Resource):
     def get(self, uri):
-        conn = DbWrapper()
+        conn = mysql.DbWrapper()
         args = getAllArgs(dict(request.args.lists()))
         response = getUrl(commands[uri] + "&a=" + agency + "&" + str(args), conn)
         return convertToJson(response.content)
 
 class SlowQueries(Resource):
     def get(self):
-        conn = DbWrapper()
+        conn = mysql.DbWrapper()
         query = conn.dbSlowQueries()
         return jsonify(query)
 
 class NumOfQueries(Resource):
     def get(self):
-        conn = DbWrapper()
+        conn = mysql.DbWrapper()
         query = conn.dbNumQueries()
         return jsonify(query)
 
