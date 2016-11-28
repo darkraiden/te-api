@@ -53,6 +53,9 @@ def getAllRoutes(r):
         p.append(route['tag'])
     return p[:]
 
+def getMinMax(p):
+    return min(p), max(p)
+
 def getStopTimes(route, direction, p):
     if route['direction'] == direction and route['serviceClass'] == 'wkd':
         trs = route.find_all('tr')
