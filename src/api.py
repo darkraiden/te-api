@@ -173,17 +173,6 @@ class DbTest(Resource):
             return err.args
         return jsonify(query)
 
-# class Test(Resource):
-#     def get(self):
-#         conn = mysql.DbWrapper()
-#         res = getArgs('r')
-#         r = Redis()
-#         response = getUrl(commands['schedule'] + "&a=" + agency, conn)
-#         r.setKey('test')
-#         app.logger.info(r.getKey('test') == 'True')
-#         r.setExpire('test')
-#         return convertToJson(response.content)
-
 class Test(Resource):
     def get(self):
         inbound = []
