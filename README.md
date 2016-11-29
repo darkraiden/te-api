@@ -70,4 +70,4 @@ If want to show all the available commands, try to interrogate `127.0.0.1:5000/d
 
 ### Not Running
 
-`/notRunning?t=<time in epoch>` - This endpoint will return a list of all the service which are not running at a given time. It accepts one parameter, `t`, that must be in `epoch time` format! 
+`/notRunning?t=<time in epoch>` - This endpoint will return a list of all the service which are not running, on weekdays, at a given time. It accepts one parameter, `t`, that must be in `epoch time` format! 
