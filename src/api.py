@@ -54,11 +54,9 @@ def getMinMax(p):
 def convertEpoch(t):
     return time.strftime('%H:%M:%S', time.localtime(t))
 
-def getNotRunning(routes, t):
+def getNotRunning(r, time):
     not_running = []
-    inbound = []
-    outbound = []
-    time = convertEpoch(t)
+    routes = getAllRoutes(r)
     for route in routes:
         schedule = requests.get(base_url + commands['schedule'] + "&a=" + agency + "&r=" + route)
         inbound, outbound = getTimes(schedule.content)
