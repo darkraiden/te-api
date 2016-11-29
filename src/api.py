@@ -83,8 +83,8 @@ def getTimes(t):
     soup = BeautifulSoup(t, 'xml')
     routes = soup.body.find_all('route')
     for route in routes:
-        getStopTimes(route, 'Inbound')
-        getStopTimes(route, 'Outbound')
+        in_times = getStopTimes(route, 'Inbound')
+        out_times = getStopTimes(route, 'Outbound')
     return sorted(in_times[:]), sorted(out_times[:])
 
 
