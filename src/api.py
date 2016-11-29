@@ -226,6 +226,10 @@ class DumpServices(Resource):
     def get(self):
         return commands
 
+class Home(Resource):
+    def get(self):
+        return "Welcome to ThousandEyes API - Code Challenge"
+
 api.add_resource(DumpServices, '/dumpServices')
 api.add_resource(DbTest, '/db')
 api.add_resource(Test, '/test')
@@ -235,6 +239,7 @@ api.add_resource(GenericUrl, '/<string:uri>')
 api.add_resource(SlowQueries, '/stats/slowQueries')
 api.add_resource(NumOfQueries, '/stats/numOfQueries')
 api.add_resource(NotRunning, '/notRunning')
+api.add_resource(Home, '/')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
