@@ -172,17 +172,6 @@ class DbTest(Resource):
             return err.args
         return jsonify(query)
 
-class Test(Resource):
-    def get(self):
-        inbound = []
-        outbound = []
-        conn = mysql.DbWrapper()
-        response = getUrl(base_url + commands['schedule'] + "&a=" + agency + "&r=6", conn)
-        r_json = convertToJson(response.content)
-        inbound, outbound = getTimes(response.content)
-        return inbound
-        # return getTimes(response.content)
-
 class RouteList(Resource):
     def get(self):
         conn = mysql.DbWrapper()
@@ -232,7 +221,6 @@ class Home(Resource):
 
 api.add_resource(DumpServices, '/dumpServices')
 api.add_resource(DbTest, '/db')
-api.add_resource(Test, '/test')
 api.add_resource(AgencyList, '/agencyList')
 api.add_resource(RouteList, '/routeList')
 api.add_resource(GenericUrl, '/<string:uri>')
