@@ -68,13 +68,12 @@ def getNotRunning(r, time):
 
 def getStopTimes(route, direction):
     p = []
-    if route['direction'] == direction and route['serviceClass'] == 'wkd':
-        trs = route.find_all('tr')
-        for tr in trs:
-            stops = tr.find_all('stop')
-            for stop in stops:
-                if stop['epochTime'] != "-1":
-                    p.append(int(stop['epochTime']))
+    trs = route.find_all('tr')
+    for tr in trs:
+        stops = tr.find_all('stop')
+        for stop in stops:
+            if stop['epochTime'] != "-1":
+                p.append(int(stop['epochTime']))
     return p[:]
 
 def getTimes(t):
@@ -83,8 +82,10 @@ def getTimes(t):
     soup = BeautifulSoup(t, 'xml')
     routes = soup.body.find_all('route')
     for route in routes:
-        in_times = getStopTimes(route, 'Inbound')
-        out_times = getStopTimes(route, 'Outbound')
+        if route['direction'] == 'Inbound' and route['serviceClass'] == 'wkd':
+            in_times = getStopTimes(route, 'Inbound')
+        if route['direction'] == 'Outbound' and route['serviceClass'] == 'wkd':
+            out_times = getStopTimes(route, 'Outbound')
     return sorted(in_times[:]), sorted(out_times[:])
 
 
