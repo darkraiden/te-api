@@ -172,18 +172,6 @@ class DbTest(Resource):
             return err.args
         return jsonify(query)
 
-class RouteList(Resource):
-    def get(self):
-        conn = mysql.DbWrapper()
-        response = getUrl(base_url + commands['routeList'] + "&a=" + agency, conn)
-        return convertToJson(response.content)
-
-class AgencyList(Resource):
-    def get(self):
-        conn = mysql.DbWrapper()
-        response = getUrl(base_url + commands['agencyList'], conn)
-        return convertToJson(response.content)
-
 class GenericUrl(Resource):
     def get(self, uri):
         conn = mysql.DbWrapper()
@@ -221,8 +209,6 @@ class Home(Resource):
 
 api.add_resource(DumpServices, '/dumpServices')
 api.add_resource(DbTest, '/db')
-api.add_resource(AgencyList, '/agencyList')
-api.add_resource(RouteList, '/routeList')
 api.add_resource(GenericUrl, '/<string:uri>')
 api.add_resource(SlowQueries, '/stats/slowQueries')
 api.add_resource(NumOfQueries, '/stats/numOfQueries')
