@@ -47,14 +47,14 @@ All the endpoints below will work with `sf-muni` agency only, which will be adde
 
 ### Expose NextBus Endpoints
 
-The ThousandEyes API allows you to get the result of any get request to NextBus API. To see which endpoints are available, you can interrogate `127.0.0.1:5000/dumpServices` which will return a Json with all the endpoint available to add as URI.
+The ThousandEyes API allows you to get the result of any `GET` request to NextBus API. To see which endpoints are available, you can interrogate `127.0.0.1:5000/dumpServices` which will return a Json with all the endpoints available to add as URI.
 eg
 
 ```
 127.0.0.1:5000/schedule?r=6
 ```
 
-The above will return all the schedules for the Route 6.
+The above will return all the schedules of the Route 6.
 
 If want to show all the available commands, try to interrogate `127.0.0.1:5000/dumpServices` - it'll return a list of NextBus endpoints.
 
