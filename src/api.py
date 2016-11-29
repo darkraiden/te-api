@@ -137,7 +137,6 @@ def getUrl(url, conn):
     conn.dbInsert(url, req_time, resp_time, tot_sec)
     return response
 
-# Class for Redis Interactions
 class Redis():
     def __init__(self):
         try:
